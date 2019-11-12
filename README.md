@@ -9,7 +9,7 @@ ___
 ### :video_game: Komande igrice:
 //trenutne komande ce verovatno biti izmenjene <br>
 <kbd>l</kbd> kamera ide levo <br>
-<kbd>d</kbd> kamera ide desno <br>
+<kbd>r</kbd> kamera ide desno <br>
 <kbd>ESC</kbd> izlazi iz igrice 
 ___
 
