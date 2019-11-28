@@ -1,19 +1,19 @@
-PROGRAM 	= shoot_training
-CC 			= gcc
-CFLAGS 		= -g -Wall -I/usr/X11R6/include -I/usr/pkg/include
-LDFLAGS 	= -lGL -lGLU -lglut -lm
-LDLIBS 		= -L/usr/X11R6/lib -L/usr/pkg/lib
+GOAL = shoot_training
+CC = gcc
+FLAGS = -lm
+OGL = -lGL -lGLU -lglut
 
-$(PROGRAM): main.o
-	$(CC) $(LDLIBS) -o $(PROGRAM) main.o $(LDFLAGS)
+$(GOAL): main.o rifle.o
+	$(CC) -o $@ $^ $(FLAGS) $(OGL)
 
-.PHONY:beauty clean dist
+main.o: main.c rifle.h rifle.c
+	$(CC) -o $@ $< -c
 
-beauty:
-	-indent -kr -nut $(PROGRAM).c
-	-rm *~ *BAK
+rifle.o: rifle.c rifle.h
+	$(CC) -o $@ $< -c
+
+.PHONY:
+	clean
+
 clean:
-	-rm *.o $(PROGRAM) *core
-
-dist: clean
-	-tar -chvj -C .. -f ../$(PROGRAM).tar.bz2 $(PROGRAM)
+	rm -rf $(GOAL) *.o
