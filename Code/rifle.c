@@ -576,11 +576,6 @@ void draw_trriger() {
 }
 
 void make_rifle() {
-    
-    glRotatef(180,0,1,0);
-    glRotatef(-90,1,0,0);
-    glScalef(0.01,0.01,0.01);
-    glTranslatef(-950,-350,170);
 
     glColor3f(0.5,0.5,0);
     draw_body();
@@ -591,9 +586,5 @@ void make_rifle() {
     draw_hand_guard(23,2,2.5);
     draw_sight(29);
     draw_trriger();
-
-    glTranslatef(950,350,-170);
-    glScalef(100,100,100);
-    glRotatef(90,1,0,0);
-    glRotatef(180,0,1,0);
+ 
 }
