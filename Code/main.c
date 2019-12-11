@@ -1,33 +1,29 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <GL/glut.h>
 
 #include "rifle.h"
+#include "func.h"
+
+#define TIMER_INTERVAL 10
+#define TIMER_ID 0
 
 #define INF 2000000
 
-static int veiw_point_x;
 static int mouse_y, mouse_x;
- int rand_x, rand_y;
-
-static float rot_y, rot_x;
+static int rand_rot, rand_trn;
+static float anim_param, t;
+static float rot_rl, rot_ud;
 
 static void on_keyboard(unsigned char key, int x, int y);
 static void on_display(void);
 static void on_reshape(int width, int height);
 static void init(void);
-void initLightAndMaterial(void);
+static void initLightAndMaterial(void);
 static void on_mouse(int button, int state, int x, int y);
 static void on_motion(int x, int y);
+static void on_timer(int);
 
-void draw_tarrget(int x, int y){
-    glBegin(GL_POLYGON);
-        glColor3f(1,1,1);
-        glVertex3f(x+1,0,y);
-        glVertex3f(x,0,y);
-        glVertex3f(x,2,y);
-        glVertex3f(x+1,2,y);
-    glEnd();
-}
 
 int main(int argc, char **argv)
 {
@@ -55,19 +51,20 @@ static void init(void)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_NORMALIZE);
     glEnable(GL_COLOR_MATERIAL);
-    //Inicijalizujemo osvetljenje
+        //Inicijalizujemo osvetljenje
     initLightAndMaterial();
-    // Postavljanje pocetne kordinate pogleda po x
-    veiw_point_x = 0;
-    // Inicijalizcija misa
+        // Inicijalizcija misa
     mouse_x = 0;
     mouse_y = 0;
-    //Inicijalizcija pocetne rotacije
-    rot_x = 0;
-    rot_y = 0;
-    //Inicijalizacija pocetne mete
-    rand_y = 30;
-    rand_x = 1;
+        //Inicijalizcija pocetne rotacije
+    rot_rl = 0;
+    rot_ud = 0;
+        //Inicijalizacija pocetne mete
+    rand_rot = 0;
+    rand_trn = 15;
+    
+    anim_param = 0;
+
     glPointSize(5);
     glLineWidth(4);
 }
@@ -75,26 +72,45 @@ static void init(void)
 static void on_keyboard(unsigned char key, int x, int y)
 {
     switch (key) {
-    case 27:
-        // Izlazak iz programa
+    case 27:    // Izlazak iz programa
         exit(0);
         break;
-    case 'l':
-        // Kretanje pogleda levo po x
-        veiw_point_x++;
+    case 'm':   //Random geerisanje mete
+        rand_rot = (rand() % 60) - 30;
+        rand_trn = (rand() % 20) + 10;
         glutPostRedisplay();
         break;
-    case 'r':
-        // Kretanje pogleda desno po x
-        veiw_point_x--;
+    
+    case 32:    //Ispaljivanje metka
+        anim_param = 1;
+        glutTimerFunc(TIMER_INTERVAL, on_timer, TIMER_ID);
+        anim_param = 0;
         glutPostRedisplay();
-        break;
-    case 'm':
-        rand_x = (rand() % 30) - 15;
-        rand_y = (rand() % 50) + 15;
-        glutPostRedisplay();
+        
         break;
     }
+    glutPostRedisplay();
+}
+
+static void on_timer(int v)
+{
+    if (v != TIMER_ID) return;
+    anim_param += 1;
+    anim_param *= 2;
+    glutPostRedisplay();
+
+    //proverava da li je meta pogodjone i ako jeste zadaje se nova
+    if(anim_param > rand_trn && (-rot_rl < rand_rot+1 && -rot_rl > rand_rot-1) ){
+        rand_rot = (rand() % 45) - 15;
+        rand_trn = (rand() % 10) + 15;
+        glutPostRedisplay();
+        return;
+    }
+
+    if (anim_param != 0 && anim_param < 100) {
+        glutTimerFunc(TIMER_INTERVAL, on_timer, TIMER_ID);
+    }
+
 }
 
 static void on_mouse(int button, int state, int x, int y)
@@ -114,15 +130,15 @@ static void on_motion(int x, int y)
 
     float mov = 0.5;
 
-    if(delta_y > mov)
-        rot_y += mov;
-    else if(delta_y < -mov)
-        rot_y -= mov;
+    if(delta_x > mov && rot_rl < 40)
+        rot_rl += mov/2;
+    else if(delta_x < -mov && rot_rl > -40)
+        rot_rl -= mov/2;
 
-    if(delta_x > mov)
-        rot_x += mov;
-    else if(delta_x < -mov)
-        rot_x -= mov;
+    if(delta_y > mov && rot_ud < 30)
+        rot_ud += mov/2;
+    else if(delta_y < -mov && rot_ud > -20)
+        rot_ud -= mov/2;
 
     glutPostRedisplay();
 }
@@ -132,15 +148,16 @@ static void on_reshape(int width, int height)
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60, (float) width / height, 0.1, 1500);
+    gluPerspective(60, (float) width / height, 0.1, 150);
 }
 
 static void on_display(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(0.4, 2, -0.85, 0, 0, 50, 0, 1, 0);
+    gluLookAt(0.35, 1.9, -0.7, 0, 0, 50, 0, 1, 0);
 
     //isacrtavanje puske
     glRotatef(180,0,1,0);
@@ -153,44 +170,29 @@ static void on_display(void)
     glRotatef(90,1,0,0);
     glRotatef(180,0,1,0);
 
+    //Metak
+    fire(anim_param);
+
     //Svet
-    glRotatef(-rot_y,90-rot_x,0,rot_x);
-    glRotatef(rot_x, 0,90,0);
-    
-    // Kordinatni sistem radi lakse orijetacije
-    glBegin(GL_LINES);
-        glColor3f(1,0,0);
-        glVertex3f(0,0,0);
-        glVertex3f(INF,0,0);
-    glEnd();
+    glPopMatrix();
+    glRotatef(-rot_ud,1,0,0);
+    glRotatef(rot_rl, 0,90,0);
 
-    glBegin(GL_LINES);
-        glColor3f(0,1,0);
-        glVertex3f(0,0,0);
-        glVertex3f(0,INF,0);
-    glEnd();
+        // Teren na kome ce biti streliste
+        glColor3f(0.3, 0.60, 0.1);
+        glBegin(GL_POLYGON);
+            glNormal3f(0,1,0);
+            glVertex3f(120,0,-10);
+            glVertex3f(-100,0,-10);
+            glVertex3f(-100,0,300);
+            glVertex3f(120,0,300);
+        glEnd();
 
-    glBegin(GL_LINES);
-        glColor3f(0,0,1);
-        glVertex3f(0,0,0);
-        glVertex3f(0,0,INF);
-    glEnd();
-
-    // Teren na kome ce biti streliste
-    glColor3f(0.3, 0.60, 0.1);
-    glBegin(GL_POLYGON);
-        glNormal3f(0,1,0);
-        glVertex3f(120,0,-10);
-        glVertex3f(-100,0,-10);
-        glVertex3f(-100,0,300);
-        glVertex3f(120,0,300);
-    glEnd();
-
-    // Meta
-    draw_tarrget(rand_x, rand_y);
+        // Meta
+        float h = 1;
+        draw_tarrget(h, rand_rot, rand_trn);
    
-    glRotatef(-rot_x, 0,90,0);    
-    glRotatef(rot_y,90-rot_x,0,rot_x);
+    glPopMatrix();
 
     glutSwapBuffers();
 }
@@ -198,7 +200,7 @@ static void on_display(void)
 void
 initLightAndMaterial(void)
 {
-    GLfloat light_position[] = { -100, 100, -100, 0 };
+    GLfloat light_position[] = {-100, 100, 100, 0 };
     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
     GLfloat light_ambient[] = { 0.1, 0.1, 0.1, 1 };
