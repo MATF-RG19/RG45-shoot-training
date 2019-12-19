@@ -8,7 +8,7 @@ ___
 
 ### :video_game: Komande igrice:
 //trenutne komande ce verovatno biti izmenjene <br>
-Nisani se pomocu misa
+Nisani se pomocu misa <br>
 <kbd>space</kbd> ispaljuje metak <br>
 <kbd>ESC</kbd> izlazi iz igrice 
 ___
