@@ -15,8 +15,8 @@ ___
 
 ### :wrench: Pokretanje igrice:
 ```shell
-git clone https://github.com/MATF-RG18/RG126-streljana.git
-cd RG126-streljana
+git clone https://github.com/MATF-RG19/RG45-shoot-training.git
+cd RG45-shoot-training
 ```
 * Pokrenite Makefile `make` <br>
 - Pokrenite igricu komandom `./shoot_training
