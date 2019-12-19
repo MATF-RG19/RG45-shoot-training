@@ -62,3 +62,14 @@ void fire(float bullet_trn)
 
     glPopMatrix();
 }
+
+void draw_tree(float s)
+{
+    glBegin(GL_POLYGON);
+        glColor3f(0.5,0.3,0.3);
+        glVertex3f(-2*s,0,0);
+        glVertex3f(-2*s,6*s,0);
+        glVertex3f(2*s, 6*s,0);
+        glVertex3f(2*s,0,0);
+    glEnd();
+}

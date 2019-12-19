@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
+#include <math.h>
 #include <GL/glut.h>
 
 #include "rifle.h"
@@ -14,6 +16,9 @@ static int mouse_y, mouse_x;
 static int rand_rot, rand_trn;
 static float anim_param, t;
 static float rot_rl, rot_ud;
+static int width, height;
+static int targets_counter, bullet_counter;
+static int on_going;
 
 static void on_keyboard(unsigned char key, int x, int y);
 static void on_display(void);
@@ -21,8 +26,10 @@ static void on_reshape(int width, int height);
 static void init(void);
 static void initLightAndMaterial(void);
 static void on_mouse(int button, int state, int x, int y);
-static void on_motion(int x, int y);
+static void on_passive_motion(int x, int y);
 static void on_timer(int);
+
+void write_text(const char* text, int x, int y);
 
 
 int main(int argc, char **argv)
@@ -38,7 +45,7 @@ int main(int argc, char **argv)
     glutKeyboardFunc(on_keyboard);
     glutDisplayFunc(on_display);
     glutMouseFunc(on_mouse);
-    glutMotionFunc(on_motion);
+    glutPassiveMotionFunc(on_passive_motion);
 
     init();
     glutMainLoop();
@@ -64,6 +71,11 @@ static void init(void)
     rand_trn = 15;
     
     anim_param = 0;
+    on_going = 0;
+
+        //Brojace pogodjenig meta
+    targets_counter = 0;
+    bullet_counter = 10;
 
     glPointSize(5);
     glLineWidth(4);
@@ -80,8 +92,14 @@ static void on_keyboard(unsigned char key, int x, int y)
         rand_trn = (rand() % 20) + 10;
         glutPostRedisplay();
         break;
-    
+    case 'r':
+    case 'R':
+        bullet_counter = 10;
+        break;
     case 32:    //Ispaljivanje metka
+        if (bullet_counter == 0)
+            break;
+        bullet_counter--;
         anim_param = 1;
         glutTimerFunc(TIMER_INTERVAL, on_timer, TIMER_ID);
         anim_param = 0;
@@ -99,10 +117,12 @@ static void on_timer(int v)
     anim_param *= 2;
     glutPostRedisplay();
 
-    //proverava da li je meta pogodjone i ako jeste zadaje se nova
-    if(anim_param > rand_trn && (-rot_rl < rand_rot+1 && -rot_rl > rand_rot-1) ){
+        //proverava da li je meta pogodjone i ako jeste zadaje se nova
+    if(anim_param > rand_trn && (-rot_rl < rand_rot+1 && -rot_rl > rand_rot-1) && rot_ud > 0.5 && rot_ud < 3){
+        srand(time(NULL));
         rand_rot = (rand() % 45) - 15;
         rand_trn = (rand() % 10) + 15;
+        targets_counter ++;
         glutPostRedisplay();
         return;
     }
@@ -117,8 +137,23 @@ static void on_mouse(int button, int state, int x, int y)
 {
     mouse_x = x;
     mouse_y = y;
+
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) { 
+        if (bullet_counter == 0)
+            return;
+    
+        bullet_counter--;
+        anim_param = 1;
+        glutTimerFunc(TIMER_INTERVAL, on_timer, TIMER_ID);
+        anim_param = 0;
+        glutPostRedisplay();
+    }	
+    
+    
+    
 }
-static void on_motion(int x, int y)
+
+static void on_passive_motion(int x, int y)
 {
     int delta_x, delta_y;
 
@@ -143,12 +178,16 @@ static void on_motion(int x, int y)
     glutPostRedisplay();
 }
 
-static void on_reshape(int width, int height)
+static void on_reshape(int w, int h)
 {
-    glViewport(0, 0, width, height);
+    width = w;
+    height = h;
+
+    glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60, (float) width / height, 0.1, 150);
+    gluPerspective(60, (float) w / h, 0.1, 150);
+
 }
 
 static void on_display(void)
@@ -158,6 +197,17 @@ static void on_display(void)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(0.35, 1.9, -0.7, 0, 0, 50, 0, 1, 0);
+
+        //Ispis teksta
+    char str[32];
+    sprintf(str, "Targets: %d", targets_counter);
+    glColor3f(1, 0, 0); 
+    write_text(str, 40, height-40);
+    sprintf(str, "Bullets: %d", bullet_counter);
+    write_text(str, width-140, height-40);
+    
+    glColor3f(0, 0.9, 0.2); 
+    write_text("-+-", width/2-10, height/2+10);
 
     //isacrtavanje puske
     glRotatef(180,0,1,0);
@@ -187,6 +237,20 @@ static void on_display(void)
             glVertex3f(-100,0,300);
             glVertex3f(120,0,300);
         glEnd();
+
+        int i = 0;
+        int tr,rt,d;
+        srand(0.3);
+        for (i = 0; i < 100; i++){
+            d = i % 2 ? -1 : 1; // strana na kojoj je drvo;
+            tr = rand()%60+20;
+            rt = rand()%50+20;
+            glPushMatrix();
+            glRotatef(60*rt/tr, 0,d,0);
+            glTranslatef(0,0,tr);
+                draw_tree(1);
+            glPopMatrix();
+        }
 
         // Meta
         float h = 1;
@@ -221,5 +285,27 @@ initLightAndMaterial(void)
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse_coeffs);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular_coeffs);
     glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
-  
+}
+
+void write_text(const char* text, int x, int y)
+{
+    glDisable(GL_LIGHTING); 
+    glPushMatrix(); 
+        glMatrixMode(GL_PROJECTION); 
+        GLdouble matrix[16];
+        glGetDoublev(GL_PROJECTION_MATRIX, matrix);
+        glLoadIdentity();
+        glOrtho(0, width, 0, height, -5, 5);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        glRasterPos2f(x,y); 
+            //ispisivanje karakera
+        for(int i = 0; text[i]; i++){
+            glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, (int) text[i]); 
+        }
+        glMatrixMode(GL_PROJECTION);
+        glLoadMatrixd(matrix); 
+        glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glEnable(GL_LIGHTING);
 }
