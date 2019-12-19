@@ -14,7 +14,9 @@ ___
 ___
 
 ### :wrench: Pokretanje igrice:
-* Preuzmite, klonirajte folder pomoću komande: :link: ``` git clone  ``` <br>
-* Pozicionirajte se u direktorijum sa igricom <br>
+```shell
+git clone https://github.com/MATF-RG18/RG126-streljana.git
+cd RG126-streljana
+```
 * Pokrenite Makefile `make` <br>
 - Pokrenite igricu komandom `./shoot_training
