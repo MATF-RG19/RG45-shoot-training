@@ -8,15 +8,15 @@ ___
 
 ### :video_game: Komande igrice:
 //trenutne komande ce verovatno biti izmenjene <br>
-<kbd>l</kbd> kamera ide levo <br>
-<kbd>r</kbd> kamera ide desno <br>
+Nisani se pomocu misa
+<kbd>space</kbd> ispaljuje metak <br>
 <kbd>ESC</kbd> izlazi iz igrice 
 ___
 
 ### :wrench: Pokretanje igrice:
 ```shell
 git clone https://github.com/MATF-RG19/RG45-shoot-training.git
-cd RG45-shoot-training
+cd RG45-shoot-training/Code
 ```
 * Pokrenite Makefile `make` <br>
 - Pokrenite igricu komandom `./shoot_training
