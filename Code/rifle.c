@@ -13,11 +13,10 @@ void set_normal_and_vertex(float u, float v, float r)
     glNormal3f(sin(v),0,cos(v));
     glVertex3f(r*sin(v),u,r*cos(v));
 }
-
+    //Crtanje cilindra kao na casu
 void draw_cilindar(float l, float r)
 {
     float u, v;
-
     glPushMatrix();
     for (u = 0; u < l-.1; u += PI / 20) {
         glBegin(GL_TRIANGLE_STRIP);
@@ -27,14 +26,12 @@ void draw_cilindar(float l, float r)
         }
         glEnd();
     }
-
     glPopMatrix();
 }
-
+    //Crtanje otvorene kupe kao na casu
 void draw_cone(float l, float r)
 {
     float v;
-
     glPushMatrix();
         glBegin(GL_TRIANGLE_STRIP);
         for (v = 0; v <= PI*2 + EPSILON; v += PI / 20) {
@@ -43,13 +40,12 @@ void draw_cone(float l, float r)
             glVertex3f(0,l,0);
         }
         glEnd();
-
     glPopMatrix();
 }
-
-void draw_body() {
     //Ova funkcija iscrtava telo puske
-
+void draw_body() 
+{
+        //Telo puske sastavljeno od poligona
     glBegin(GL_POLYGON);
         glNormal3f(0, 0, 1);
         glVertex3f(-1,0,2);
@@ -111,12 +107,9 @@ void draw_body() {
         glVertex3f(-1.5,-30,-2);
     glEnd();
 
-    //Sarzer
-
-     glTranslatef(0,-32,-3);
-
+        //Sarzer sastavljen od poligona i valjkova
+    glTranslatef(0,-32,-3);
     glRotatef(-80, 1,0,0);
-
     draw_cilindar(6,0.8);
     glTranslatef(0,0,6);
     draw_cilindar(6,0.8);
@@ -138,17 +131,14 @@ void draw_body() {
     glEnd();
     
     glRotatef(80,1,0,0);
-
     glTranslatef(0,32,3);
 }
-
-void draw_gunstock(float l, float r, float h){
-    //Ova funkcija iscrtava kundak
-
+     //Ova funkcija iscrtava kundak duzine l, sirine r, visine h
+void draw_gunstock(float l, float r, float h)
+{
     float u, v;
-
     glTranslatef(0,-42,1);
-
+        //Crtanje polu valjka
     for (u = 0; u < l-.2; u += PI / 20) {
         glBegin(GL_TRIANGLE_STRIP);
         for (v = -PI/2; v <= PI/2 + EPSILON; v += PI / 10) {
@@ -157,15 +147,15 @@ void draw_gunstock(float l, float r, float h){
         }
         glEnd();
     }
-
+        //Poklopac polu valjka
     glBegin(GL_TRIANGLE_STRIP);
         for (v = -PI/2; v <= PI/2 + EPSILON; v += PI / 20) {
             glNormal3f(0,-1,0);
             glVertex3f(r*sin(v),0,r*cos(v));
             glVertex3f(0,0,0);
         }
-        glEnd();
-
+    glEnd();
+        //Stranice kundaka
     glBegin(GL_POLYGON);
         glNormal3f(-1, 0, 0);
         glVertex3f(-r,0,0);
@@ -195,14 +185,12 @@ void draw_gunstock(float l, float r, float h){
         glVertex3f(-r,0,0);
         glVertex3f(r,0,0);
     glEnd();
-
     glPopMatrix();
     glTranslatef(0,42,1);
 }
-
+    //Iscrtavanje delova za drzanje
 void draw_hand_guard(float l, float w, float h) 
 {
-    //Iscrtavanje delova za drzanje
     glTranslatef(0,-11,-3.5);
     glBegin(GL_POLYGON);
         glNormal3f(-1,0,0);
@@ -219,8 +207,6 @@ void draw_hand_guard(float l, float w, float h)
         glVertex3f(w,l-2,-h);
         glVertex3f(w,0,-h);
     glEnd();
-
-    
 
     glBegin(GL_POLYGON);
         glNormal3f(5,0,-1);
@@ -243,7 +229,6 @@ void draw_hand_guard(float l, float w, float h)
         glVertex3f(-w+0.2,0,-h-1);
     glEnd();
 
-    
     glBegin(GL_POLYGON);
         glNormal3f(0, -1, 0);
         glVertex3f(-w,0,0);
@@ -253,7 +238,6 @@ void draw_hand_guard(float l, float w, float h)
         glVertex3f(w,0,-h);
         glVertex3f(w,0,0);
     glEnd(); 
-    
 
     glBegin(GL_POLYGON);
         glNormal3f(0, 0, 1);
@@ -265,13 +249,11 @@ void draw_hand_guard(float l, float w, float h)
 
     glTranslatef(0,11,3.5);
 
-    //deo za drzanje
+        //deo za drzanje
     glTranslatef(0,-18,-1.5);
-
     glRotatef(-110, 1,0,0);
 
     float wd = 0.8; //Sirina drzaca
-
     draw_cilindar(10,wd);
     glTranslatef(0,0,3);
     draw_cilindar(10,wd);
@@ -300,11 +282,9 @@ void draw_hand_guard(float l, float w, float h)
     glEnd();    
     
     glRotatef(110,1,0,0);
-
     glTranslatef(0,18,1.5);
 
     //dodatak iznad okidaca
-
     glBegin(GL_POLYGON);
         glVertex3f(wd,-16,-4.5);
         glVertex3f(wd,-16,-2);
@@ -329,11 +309,9 @@ void draw_hand_guard(float l, float w, float h)
     
 
 }
-
+    // Nisani i delovi vezani za njih
 void draw_sight(float l) 
 {
-    // Nisani i delovi vezani za njih
-
     float w = 1.2;
     glTranslatef(0,-15,-0.5);
 
@@ -374,16 +352,13 @@ void draw_sight(float l)
         glVertex3f(w,0,1);
         glVertex3f(-w,0,1);
     glEnd();
-    
-   
     glTranslatef(0,15,0.5);
 
     //drazac snajpera
     float wr = 1; //Sirina drzaca
-
     glTranslatef(0,-10,0);
-
     glColor3f(0.4,0.4,0.4);
+
     glBegin(GL_POLYGON);
         glNormal3f(-1,0,0);
         glVertex3f(-wr,2,0);
@@ -398,10 +373,9 @@ void draw_sight(float l)
         glVertex3f(wr,5,2);
         glVertex3f(wr,7,0);
     glEnd();
-
     glTranslatef(0,10,0);
 
-    //Snajper
+    /   /Snajper
     glColor3f(0.3,0.3,0.3);
     glTranslatef(0,-16,3);
         draw_cilindar(12,1.6);
@@ -425,15 +399,11 @@ void draw_sight(float l)
         glutSolidSphere(1.5,20,20);
         glTranslatef(0,-2,0);
         glColor3f(0.2,.2,.2);
-            draw_cone(2.4,1.6);
-
-        
+        draw_cone(2.4,1.6);
     glTranslatef(0,16,-3);
 
     //Prednji nisan
-
     glTranslatef(0,37,-3);
-
     glColor3f(0.2,0.2,0.2);
     glBegin(GL_POLYGON);
         glNormal3f(0,0,1);
@@ -494,10 +464,9 @@ void draw_sight(float l)
     glTranslatef(0,-37,3);
     
 }
-
-void draw_trriger() {
     //Okidac i delovi oko njega
-
+void draw_trriger() 
+{
     float w = 0.4;
     float h = 0.5;
     float e = 0.6;
@@ -527,7 +496,7 @@ void draw_trriger() {
         glVertex3f(0,0,3);
     glEnd();
 
-    //zastitnik okidaca
+        //zastitnik okidaca
     glBegin(GL_POLYGON);
         glVertex3f(-w,0,0);
         glVertex3f(-w,0,-h);
@@ -573,9 +542,9 @@ void draw_trriger() {
     glTranslatef(0,14,6.3);
 
 }
-
-void make_rifle() {
-
+    //Ovde sastavljamo sve delove puske u jednu celinu
+void make_rifle() 
+{
     glColor3f(0.8,0.8,0.4);
     draw_body();
     glColor3f(0.4,0.4,0.4);
@@ -585,5 +554,4 @@ void make_rifle() {
     draw_hand_guard(23,2,2.5);
     draw_sight(29);
     draw_trriger();
- 
 }
