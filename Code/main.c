@@ -4,8 +4,14 @@
 #include <math.h>
 #include <GL/glut.h>
 
+#include "hands.h"
 #include "rifle.h"
 #include "func.h"
+
+#include "image.h"
+static GLuint names[2];
+#define FILENAME1 "tree.bmp"
+static float matrix[16];
 
 #define TIMER_INTERVAL 10
 #define TIMER_ID 0
@@ -28,9 +34,7 @@ static void initLightAndMaterial(void);
 static void on_mouse(int button, int state, int x, int y);
 static void on_passive_motion(int x, int y);
 static void on_timer(int);
-
 void write_text(const char* text, int x, int y);
-
 
 int main(int argc, char **argv)
 {
@@ -69,16 +73,45 @@ static void init(void)
         //Inicijalizacija pocetne mete
     rand_rot = 0;
     rand_trn = 15;
-    
+        //Animacija
     anim_param = 0;
     on_going = 0;
-
         //Brojace pogodjenig meta
     targets_counter = 0;
     bullet_counter = 10;
 
     glPointSize(5);
     glLineWidth(4);
+
+     Image * image;
+
+    //glEnable(GL_TEXTURE_2D);
+
+    glTexEnvf(GL_TEXTURE_ENV,
+              GL_TEXTURE_ENV_MODE,
+              GL_REPLACE);
+
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    image = image_init(0, 0);
+
+    image_read(image, FILENAME1);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->width, image->height, 
+                    0, GL_RGBA, GL_UNSIGNED_BYTE, image->pixels);
+
+    /* Iskljucujemo aktivnu teksturu */
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    /* Unistava se objekat za citanje tekstura iz fajla. */
+    image_done(image);
+
 }
 
 static void on_keyboard(unsigned char key, int x, int y)
@@ -104,7 +137,6 @@ static void on_keyboard(unsigned char key, int x, int y)
         glutTimerFunc(TIMER_INTERVAL, on_timer, TIMER_ID);
         anim_param = 0;
         glutPostRedisplay();
-        
         break;
     }
     glutPostRedisplay();
@@ -148,28 +180,21 @@ static void on_mouse(int button, int state, int x, int y)
         anim_param = 0;
         glutPostRedisplay();
     }	
-    
-    
-    
 }
 
 static void on_passive_motion(int x, int y)
 {
     int delta_x, delta_y;
-
     delta_x = x - mouse_x;
     delta_y = y - mouse_y;
-
     mouse_x = x;
     mouse_y = y;
-
     float mov = 0.5;
 
     if(delta_x > mov && rot_rl < 40)
         rot_rl += mov/2;
     else if(delta_x < -mov && rot_rl > -40)
         rot_rl -= mov/2;
-
     if(delta_y > mov && rot_ud < 30)
         rot_ud += mov/2;
     else if(delta_y < -mov && rot_ud > -20)
@@ -210,14 +235,31 @@ static void on_display(void)
     write_text("-+-", width/2-10, height/2+10);
 
     //isacrtavanje puske
+    float f_react = anim_param < 3 ? 3*anim_param : 0;
+
     glRotatef(180,0,1,0);
-    glRotatef(-90,1,0,0);
+    glRotatef(-90+f_react,1,0,0);
     glScalef(0.01,0.01,0.01);
     glTranslatef(0,0,165);  
         make_rifle();
+        glPushMatrix();
+            glTranslatef(-4,-6,-8);
+            glRotatef(15,0,-1,0);
+            glRotatef(40,0,0,1);
+            glScalef(0.7,0.7,0.7);
+            glRotatef(10,1,0,1);
+            make_left_hand();
+        glPopMatrix();    
+        glPushMatrix();
+            glTranslatef(-8.2,-6,-9);
+            glRotatef(15,0,-1,0);
+            glRotatef(45,0,0,1);
+            glScalef(0.9,0.9,0.9);
+            make_right_hand();
+        glPopMatrix();
     glTranslatef(0,0,-165);
     glScalef(100,100,100);
-    glRotatef(90,1,0,0);
+    glRotatef(90-f_react,1,0,0);
     glRotatef(180,0,1,0);
 
     //Metak
@@ -227,7 +269,6 @@ static void on_display(void)
     glPopMatrix();
     glRotatef(-rot_ud,1,0,0);
     glRotatef(rot_rl, 0,90,0);
-
         // Teren na kome ce biti streliste
         glColor3f(0.3, 0.60, 0.1);
         glBegin(GL_POLYGON);
@@ -239,23 +280,36 @@ static void on_display(void)
         glEnd();
 
         int i = 0;
-        int tr,rt,d;
-        srand(0.3);
-        for (i = 0; i < 100; i++){
+        int tr,rt,d,sx,sy;
+        srand(12);
+        for (i = 0; i < 180; i++){
             d = i % 2 ? -1 : 1; // strana na kojoj je drvo;
-            tr = rand()%60+20;
+            tr = (180-i)+20;
             rt = rand()%50+20;
+            sx = rand()%10;
+            sy = rand()%10;
             glPushMatrix();
             glRotatef(60*rt/tr, 0,d,0);
             glTranslatef(0,0,tr);
-                draw_tree(1);
+                glEnable(GL_BLEND);
+                glEnable(GL_TEXTURE_2D);
+                glBindTexture(GL_TEXTURE_2D, names[1]);
+                glScalef(0.5+sx/10.0,0.5+sy/20.0,.5);
+                glBegin(GL_QUADS);
+                    glTexCoord2f(0.2,0); glVertex3f(0,0,0);
+                    glTexCoord2f(1.2,0); glVertex3f(8,0,0);
+                    glTexCoord2f(1.2,1); glVertex3f(8,16,0);
+                    glTexCoord2f(0.2,1); glVertex3f(0,16,0);
+                glEnd();
+                glBindTexture(GL_TEXTURE_2D, 0);
+                glDisable(GL_TEXTURE_2D);
+                glDisable(GL_BLEND);
             glPopMatrix();
         }
 
         // Meta
         float h = 1;
         draw_tarrget(h, rand_rot, rand_trn);
-   
     glPopMatrix();
 
     glutSwapBuffers();
@@ -268,12 +322,11 @@ initLightAndMaterial(void)
     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
     GLfloat light_ambient[] = { 0.1, 0.1, 0.1, 1 };
-    GLfloat light_diffuse[] = { 0.7, 0.7, 0.7, 1 };
+    GLfloat light_diffuse[] = { 0.6, 0.7, 0.7, 1 };
     GLfloat light_specular[] = { 0.9, 0.9, 0.9, 1 };
-    GLfloat ambient_coeffs[] = { 0.3, 0.7, 0.3, 1 };
+    GLfloat ambient_coeffs[] = { 0.3, 0.5, 0.3, 1 };
     GLfloat diffuse_coeffs[] = { 1, 1, 1, 1 };
     GLfloat specular_coeffs[] = { 0.1, 0.1, 0.1, 1 };
-
     GLfloat shininess = 30;
 
     glEnable(GL_LIGHTING);

@@ -72,4 +72,6 @@ void draw_tree(float s)
         glVertex3f(2*s, 6*s,0);
         glVertex3f(2*s,0,0);
     glEnd();
+
+    
 }

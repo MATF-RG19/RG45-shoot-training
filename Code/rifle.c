@@ -332,12 +332,13 @@ void draw_hand_guard(float l, float w, float h)
 
 void draw_sight(float l) 
 {
-    // Nisani i delovi nezani za njih
+    // Nisani i delovi vezani za njih
 
     float w = 1.2;
     glTranslatef(0,-15,-0.5);
 
     glBegin(GL_POLYGON);
+        glNormal3f(-1,0,0);
         glVertex3f(-w,0,0);
         glVertex3f(-w,0,1);
         glVertex3f(-w,l+0.8,1);
@@ -382,7 +383,7 @@ void draw_sight(float l)
 
     glTranslatef(0,-10,0);
 
-    glColor3f(0.3,0.3,0.3);
+    glColor3f(0.4,0.4,0.4);
     glBegin(GL_POLYGON);
         glNormal3f(-1,0,0);
         glVertex3f(-wr,2,0);
@@ -428,8 +429,6 @@ void draw_sight(float l)
 
         
     glTranslatef(0,16,-3);
-
-
 
     //Prednji nisan
 
@@ -577,11 +576,11 @@ void draw_trriger() {
 
 void make_rifle() {
 
-    glColor3f(0.5,0.5,0);
+    glColor3f(0.8,0.8,0.4);
     draw_body();
+    glColor3f(0.4,0.4,0.4);
+    draw_cilindar(40, 1); 
     glColor3f(0.3,0.3,0.3);
-    draw_cilindar(40, 1);
-    glColor3f(0.3,0.5,0.4);
     draw_gunstock(20,2,10);
     draw_hand_guard(23,2,2.5);
     draw_sight(29);
