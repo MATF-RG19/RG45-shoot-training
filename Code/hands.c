@@ -58,7 +58,7 @@ void make_left_hand()
     glRotatef(90,0,1,0);
     glRotatef(90,0,0,1);
     glScalef(0.7,0.7,0.7);
-    glColor3f(0.5,0.2,0);
+    glColor3f(0.7,0.7,0);
         //Pozicioniranje prstiju
     glPushMatrix();
         draw_hand();
@@ -105,7 +105,7 @@ void make_right_hand()
     glRotatef(90,0,1,0);
     glRotatef(90,0,0,1);
     glScalef(0.5,0.5,0.5);
-    glColor3f(0.5,0.5,0);
+    glColor3f(0.7,0.7,0);
     glPushMatrix(); 
         glTranslatef(-40,0,-10);
         glRotatef(40,0,1,0);
