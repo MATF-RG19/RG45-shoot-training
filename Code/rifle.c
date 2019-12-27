@@ -375,7 +375,7 @@ void draw_sight(float l)
     glEnd();
     glTranslatef(0,10,0);
 
-    /   /Snajper
+        //Snajper
     glColor3f(0.3,0.3,0.3);
     glTranslatef(0,-16,3);
         draw_cilindar(12,1.6);
