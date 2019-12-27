@@ -1,3 +1,6 @@
+/////////////////////////////////////////////
+/// Preuzeto sa 7.casa vezbi 
+////////////////////////////////////////////
 /*
  * Dve strukture koje opisuju strukturu dva zaglavlja
  * kojima pocinje svaka slika u bmp formatu.
