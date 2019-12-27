@@ -17,6 +17,6 @@ ___
 ```shell
 git clone https://github.com/MATF-RG19/RG45-shoot-training.git
 cd RG45-shoot-training/Code
+make
+./shoot_training
 ```
-* Pokrenite Makefile `make` <br>
-- Pokrenite igricu komandom `./shoot_training
