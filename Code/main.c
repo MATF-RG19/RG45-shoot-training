@@ -9,8 +9,9 @@
 #include "func.h"
 
 #include "image.h"
-static GLuint names[2];
+static GLuint names[3];
 #define FILENAME1 "tree.bmp"
+#define FILENAME2 "garss.bmp"
 static float matrix[16];
 
 #define TIMER_INTERVAL 10
@@ -96,7 +97,10 @@ static void init(void)
 
     image = image_init(0, 0);
 
+    glGenTextures(3,names);
+
     image_read(image, FILENAME1);
+    glBindTexture(GL_TEXTURE_2D, names[1]);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -105,6 +109,18 @@ static void init(void)
 	
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->width, image->height, 
                     0, GL_RGBA, GL_UNSIGNED_BYTE, image->pixels);
+
+
+    image_read(image, FILENAME2);
+    glBindTexture(GL_TEXTURE_2D, names[0]);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height, 
+                    0, GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
 
     /* Iskljucujemo aktivnu teksturu */
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -148,9 +164,9 @@ static void on_timer(int v)
     anim_param += 1;
     anim_param *= 2;
     glutPostRedisplay();
-
+        // TO DO postavi bolji pogodak
         //proverava da li je meta pogodjone i ako jeste zadaje se nova
-    if(anim_param > rand_trn && (-rot_rl < rand_rot+1 && -rot_rl > rand_rot-1) && rot_ud > 0.5 && rot_ud < 3){
+    if(anim_param > rand_trn && (-rot_rl < rand_rot+25/25 && -rot_rl > rand_rot-25/25 ) && rot_ud > 0.5 && rot_ud < 3){
         srand(time(NULL));
         rand_rot = (rand() % 45) - 15;
         rand_trn = (rand() % 10) + 15;
@@ -192,13 +208,13 @@ static void on_passive_motion(int x, int y)
     float mov = 0.5;
 
     if(delta_x > mov && rot_rl < 40)
-        rot_rl += mov/2;
+        rot_rl += mov;
     else if(delta_x < -mov && rot_rl > -40)
-        rot_rl -= mov/2;
+        rot_rl -= mov;
     if(delta_y > mov && rot_ud < 30)
-        rot_ud += mov/2;
+        rot_ud += mov;
     else if(delta_y < -mov && rot_ud > -20)
-        rot_ud -= mov/2;
+        rot_ud -= mov;
 
     glutPostRedisplay();
 }
@@ -235,7 +251,7 @@ static void on_display(void)
     write_text("-+-", width/2-10, height/2+10);
 
     //isacrtavanje puske
-    float f_react = anim_param < 3 ? 3*anim_param : 0;
+    float f_react = anim_param < 10 ? anim_param : 0;
 
     glRotatef(180,0,1,0);
     glRotatef(-90+f_react,1,0,0);
@@ -269,15 +285,18 @@ static void on_display(void)
     glPopMatrix();
     glRotatef(-rot_ud,1,0,0);
     glRotatef(rot_rl, 0,90,0);
-        // Teren na kome ce biti streliste
-        glColor3f(0.3, 0.60, 0.1);
-        glBegin(GL_POLYGON);
+
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, names[0]);
+        glBegin(GL_QUADS);
             glNormal3f(0,1,0);
-            glVertex3f(120,0,-10);
-            glVertex3f(-100,0,-10);
-            glVertex3f(-100,0,300);
-            glVertex3f(120,0,300);
+            glTexCoord2f(0,0); glVertex3f(100,0,-10);
+            glTexCoord2f(50,0); glVertex3f(-100,0,-10);
+            glTexCoord2f(50,50);  glVertex3f(-100,0,300);
+            glTexCoord2f(0,50); glVertex3f(100,0,300);
         glEnd();
+        glBindTexture(GL_TEXTURE_2D, 0);
+        //glDisable(GL_TEXTURE_2D);
 
         int i = 0;
         int tr,rt,d,sx,sy;
