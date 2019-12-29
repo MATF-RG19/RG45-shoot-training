@@ -134,6 +134,7 @@ static void on_keyboard(unsigned char key, int x, int y)
     case 'R': // Brojac metkova u sarzeru
         bullet_counter = 10;
         break;
+    }
     glutPostRedisplay();
 }
 
