@@ -69,6 +69,7 @@ static void init(void)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_NORMALIZE);
     glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_MULTiSAMPLE);
         // Inicijalizujemo osvetljenje
     initLightAndMaterial();
         // Inicijalizcija misa
@@ -253,9 +254,9 @@ static void on_display(void)
         glBegin(GL_QUADS);
             glNormal3f(0,1,0);
             glTexCoord2f(0,0); glVertex3f(100,0,-10);
-            glTexCoord2f(5*texture_param,0); glVertex3f(-100,0,-10);
-            glTexCoord2f(5*texture_param,5*texture_param); glVertex3f(-100,0,300);
-            glTexCoord2f(0,5*texture_param); glVertex3f(100,0,300);
+            glTexCoord2f(3*texture_param,0); glVertex3f(-100,0,-10);
+            glTexCoord2f(3*texture_param,3*texture_param); glVertex3f(-100,0,300);
+            glTexCoord2f(0,3*texture_param); glVertex3f(100,0,300);
         glEnd();
         glBindTexture(GL_TEXTURE_2D, 0);
         int i = 0;
@@ -327,7 +328,7 @@ static void on_display(void)
     if(bullet_counter <= 2 && on_going > 0) {
 	glColor3f(1,0,0);
 	write_text(" Low Ammuniton", width/2-40, height*0.75);
-	write_text("Recharge on 'R' ", width/2-40, height*0.70);
+	write_text("Reload on 'R' ", width/2-40, height*0.70);
     }
 	// Ispisujemo vreme preostalo vreme
     if(on_going > 0){
