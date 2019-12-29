@@ -48,8 +48,8 @@ int main(int argc, char **argv)
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
 
-    glutInitWindowSize(1600, 900);
-    glutInitWindowPosition(64, 32);
+    glutInitWindowSize(1920,1080);
+    glutInitWindowPosition(32, 16);
     glutCreateWindow(argv[0]);
 
     glutReshapeFunc(on_reshape);
@@ -134,16 +134,6 @@ static void on_keyboard(unsigned char key, int x, int y)
     case 'R': // Brojac metkova u sarzeru
         bullet_counter = 10;
         break;
-    case 32:    // Ispaljivanje metka
-        if (bullet_counter == 0)
-            break;
-        bullet_counter--;
-        anim_param = 1;
-        glutTimerFunc(TIMER_INTERVAL, on_timer, TIMER_ID);
-        anim_param = 0;
-        glutPostRedisplay();
-        break;
-    }
     glutPostRedisplay();
 }
 
