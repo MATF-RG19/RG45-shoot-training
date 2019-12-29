@@ -69,7 +69,7 @@ static void init(void)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_NORMALIZE);
     glEnable(GL_COLOR_MATERIAL);
-    glEnable(GL_MULTiSAMPLE);
+    glEnable(GL_MULTISAMPLE);
         // Inicijalizujemo osvetljenje
     initLightAndMaterial();
         // Inicijalizcija misa
