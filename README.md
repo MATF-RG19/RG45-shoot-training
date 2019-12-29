@@ -9,15 +9,16 @@ ___
 ### :video_game: Komande igrice:
 Nisan se krece u pracu kretanja strelice misa <br>
 <kbd>levi kilk</kbd> ispaljuje metak <br>
-<kbd>S/s</kbd> Pokrece se partija <br>
+<kbd>S/s</kbd> Pokrece se nova partija <br>
 <kbd>F/f</kbd> Bira se mod igranja u sumi <br>
 <kbd>C/c</kbd> Bira se mod igranja u gradu <br>
-<kbd>R/r</kbd> Puni sarzer <br>
+<kbd>R/r</kbd> Puni se sarzer <br>
 <kbd>E/e</kbd> Zavrsava se partija <br>
 <kbd>ESC</kbd> izlazi iz igrice 
 ___
 
 ### :wrench: Pokretanje igrice:
+Igricu pokrecete tako sto iskopirate blok sledecih naredbi u vas terminal 
 ```shell
 git clone https://github.com/MATF-RG19/RG45-shoot-training.git
 cd RG45-shoot-training/Code
