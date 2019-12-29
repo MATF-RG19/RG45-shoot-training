@@ -35,7 +35,7 @@ void draw_hand()
         glutSolidCube(1);   
     glPopMatrix();
 }
-    //Prsti sa velicinom scl i iskrivljenost prsta rot
+    // Prsti sa velicinom scl i iskrivljenost prsta rot
 void draw_finger(float rot, float scl)
 {
     glPushMatrix();
@@ -52,45 +52,45 @@ void draw_finger(float rot, float scl)
         glutSolidSphere(1*scl,10,5);
     glPopMatrix();
 }
-    //Iscrtavanje leve ruke
+    // Iscrtavanje leve ruke
 void make_left_hand()
 {
     glRotatef(90,0,1,0);
     glRotatef(90,0,0,1);
     glScalef(0.7,0.7,0.7);
-    glColor3f(0.7,0.7,0);
-        //Pozicioniranje prstiju
+    glColor3f(0.9,0.8,0.5);
+        // Pozicioniranje prstiju
     glPushMatrix();
         draw_hand();
-        glPushMatrix(); //Palac
+        glPushMatrix(); // Palac
             glTranslatef(2,-3,-1);
             glRotatef(50,1,0,0);
             glRotatef(70,0,1,0);
             glRotatef(40,0,0,-1);
             draw_finger(30,1.2);
         glPopMatrix();
-        glPushMatrix();//Kaziprst
+        glPushMatrix();// Kaziprst
             glTranslatef(3,-2,10);
             glRotatef(-20,0,1,0);
             glRotatef(50,1,0,0);
             glRotatef(-80,0,1,0);
             draw_finger(20,1.05);
         glPopMatrix();
-        glPushMatrix();//srednji
+        glPushMatrix();// Srednji
             glTranslatef(0,-2.2,10);
             glRotatef(-20,0,1,0);
             glRotatef(50,1,0,0);
             glRotatef(-80,0,1,0);
             draw_finger(22,1.1);
         glPopMatrix();
-        glPushMatrix();//Domali
+        glPushMatrix();// Domali
             glTranslatef(-2.5,-2,10);
             glRotatef(-25,0,1,0);
             glRotatef(50,1,0,0);
             glRotatef(-80,0,1,0);
             draw_finger(25,1);
         glPopMatrix();
-        glPushMatrix();//Mali
+        glPushMatrix();// Mali
             glTranslatef(-5,-1.5,10);
             glRotatef(-30,0,1,0);
             glRotatef(50,1,0,0);
@@ -99,45 +99,45 @@ void make_left_hand()
         glPopMatrix();
     glPopMatrix();
 }
-    //Crtanje desne ruke
+    // Crtanje desne ruke
 void make_right_hand()
 {
     glRotatef(90,0,1,0);
     glRotatef(90,0,0,1);
     glScalef(0.5,0.5,0.5);
-    glColor3f(0.7,0.7,0);
+    glColor3f(0.9,0.8,0.5);
     glPushMatrix(); 
         glTranslatef(-40,0,-10);
         glRotatef(40,0,1,0);
         glRotatef(-80,0,0,1);
         draw_hand();
-        glPushMatrix(); //Palac
+        glPushMatrix(); // Palac
             glTranslatef(-4,0,-1);
             glRotatef(90,0,1,0);
             draw_finger(50,1.2);
         glPopMatrix();
-        glPushMatrix();//Kaziprst
+        glPushMatrix();// Kaziprst
             glTranslatef(-3,-2,10);
             glRotatef(20,0,1,0);
             glRotatef(50,1,0,0);
             glRotatef(-80,0,1,0);
             draw_finger(50,1.05);
         glPopMatrix();
-        glPushMatrix();//srednji
+        glPushMatrix();// Srednji
             glTranslatef(0,-2.2,10);
             glRotatef(20,0,1,0);
             glRotatef(50,1,0,0);
             glRotatef(-80,0,1,0);
             draw_finger(52,1.1);
         glPopMatrix();
-        glPushMatrix();//Domali
+        glPushMatrix();// Domali
             glTranslatef(2.5,-2,10);
             glRotatef(25,0,1,0);
             glRotatef(50,1,0,0);
             glRotatef(-80,0,1,0);
             draw_finger(55,1);
         glPopMatrix();
-        glPushMatrix();//Mali
+        glPushMatrix();// Mali
             glTranslatef(5,-1.5,10);
             glRotatef(30,0,1,0);
             glRotatef(50,1,0,0);

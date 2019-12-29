@@ -18,14 +18,19 @@ static char* FILENAME2 = "grass.bmp";
 static float matrix[16];
 static GLuint names[3];
 
+static long t;
 static int mouse_y, mouse_x;
 static float rand_rot, rand_trn;
-static float anim_param, t;
+static float anim_param;
 static float rot_rl, rot_ud;
 static int width, height;
 static int targets_counter, bullet_counter;
+static int best_score = -1;
 static int on_going;
 static int texture_param;
+static int start = 0;
+int target_limit = 0;	
+int time_limit = 0;
 
 static void on_keyboard(unsigned char key, int x, int y);
 static void on_display(void);
@@ -64,30 +69,31 @@ static void init(void)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_NORMALIZE);
     glEnable(GL_COLOR_MATERIAL);
-        //Inicijalizujemo osvetljenje
+        // Inicijalizujemo osvetljenje
     initLightAndMaterial();
         // Inicijalizcija misa
     mouse_x = 0;
     mouse_y = 0;
-        //Inicijalizcija pocetne rotacije
+        // Inicijalizcija pocetne rotacije
     rot_rl = 0;
     rot_ud = 0;
-        //Inicijalizacija pocetne mete
+        // Inicijalizacija pocetne mete
     rand_rot = 0;
     rand_trn = 15;
-        //Animacija
+        // Animacija
     anim_param = 0;
     on_going = 0;
-        //Brojace pogodjenig meta
+    t = time(NULL);
+        // Brojace pogodjenig meta
     targets_counter = 0;
     bullet_counter = 10;
-	//Inicijalizcija primitiva
+	// Inicijalizcija primitiva
     glPointSize(5);
     glLineWidth(4);
-	//Inicijalizacija promenljive za scaliranje texture
+	// Inicijalizacija promenljive za scaliranje texture
     texture_param = 10;
 
-        //Inicijalizacij teksture
+        // Inicijalizacij teksture
     init_texture();
 }
 
@@ -97,25 +103,38 @@ static void on_keyboard(unsigned char key, int x, int y)
     case 27:    // Izlazak iz programa
         exit(0);
         break;
+    case 's':
+    case 'S':   // Pokrecemo igru
+	on_going = 1;
+	t = time(NULL);
+	target_limit = 5;	
+	time_limit = 10;
+	targets_counter = 0;
+	bullet_counter = 10;
+        break;
+    case 'e':
+    case 'E':   // Zavrsavamo partiju
+	on_going = -1;
+        break;
     case 'c':
-    case 'C':   //Ukljucujemo city mode
+    case 'C':   // Ukljucujemo city mode
 	texture_param = 30;
 	FILENAME1 = "build.bmp";
         FILENAME2 = "asph.bmp";
 	init_texture();
         break;
     case 'f':
-    case 'F':   //Ukljucujemo forest mode
+    case 'F':   // Ukljucujemo forest mode
 	texture_param = 10;
 	FILENAME1 = "tree.bmp";
         FILENAME2 = "grass.bmp";
 	init_texture();
         break;
     case 'r':
-    case 'R':
+    case 'R': // Brojac metkova u sarzeru
         bullet_counter = 10;
         break;
-    case 32:    //Ispaljivanje metka
+    case 32:    // Ispaljivanje metka
         if (bullet_counter == 0)
             break;
         bullet_counter--;
@@ -134,8 +153,7 @@ static void on_timer(int v)
     anim_param += 1;
     anim_param *= 2;
     glutPostRedisplay();
-        // TO DO postavi bolji pogodak
-        //proverava da li je meta pogodjone i ako jeste zadaje se nova
+        // Proverava da li je meta pogodjone i ako jeste zadaje se nova
     if(anim_param > rand_trn && (-rot_rl < rand_rot+25/(float)rand_trn && -rot_rl > rand_rot-25/(float)rand_trn ) && rot_ud > 0.5/(float)rand_trn && rot_ud < 3*25/(float)rand_trn){
         srand(time(NULL));
         rand_rot = (rand() % 45) - 15;
@@ -154,9 +172,9 @@ static void on_mouse(int button, int state, int x, int y)
     mouse_x = x;
     mouse_y = y;
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) { 
-        if (bullet_counter == 0)
+        if (bullet_counter == 0 || on_going <= 0) 
             return;
-            //Ispaljivanje metka
+            // Ispaljivanje metka
         bullet_counter--;
         anim_param = 1;
         glutTimerFunc(TIMER_INTERVAL, on_timer, TIMER_ID);
@@ -174,7 +192,7 @@ static void on_passive_motion(int x, int y)
     mouse_y = y;
     float mov = 0.5;
     float eps = 0.01;
-        //Kretanje kamere
+        // Kretanje kamere
     if(delta_x > eps && rot_rl < 40)
         rot_rl += mov;
     else if(delta_x < -eps && rot_rl > -40)
@@ -193,26 +211,21 @@ static void on_reshape(int w, int h)
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60, (float) w / h, 0.1, 150);
+    gluPerspective(60, (float) w / h, 0.1, 200);
 }
 
 static void on_display(void)
 {
+    long current_time = time(NULL) - t;
+    char str[32];
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(0.35, 1.9, -0.7, 0, 0, 50, 0, 1, 0);
-        //Ispis teksta
-    char str[32];
-    sprintf(str, "Targets: %d", targets_counter);
-    glColor3f(1, 0, 0); 
-    write_text(str, 40, height-40);
-    sprintf(str, "Bullets: %d", bullet_counter);
-    write_text(str, width-140, height-40);
-        //Nisan
-    glColor3f(0, 0.9, 0.2); 
+        // Nisan
+    glColor3f(1, 0.4, 0.1); 
     write_text("-+-", width/2-10, height/2+10);
-        //isacrtavanje puske
+        // Isacrtavanje puske
     float f_react = anim_param < 10 ? anim_param : 0;
     glRotatef(180,0,1,0);
     glRotatef(-90+f_react,1,0,0);
@@ -238,9 +251,9 @@ static void on_display(void)
     glScalef(100,100,100);
     glRotatef(90-f_react,1,0,0);
     glRotatef(180,0,1,0);
-        //Metak
+        // Metak
     fire(anim_param);
-        //Svet
+        // Okolina
     glPopMatrix();
     glRotatef(-rot_ud,1,0,0);
     glRotatef(rot_rl, 0,90,0);
@@ -258,7 +271,7 @@ static void on_display(void)
         int tr,rt,d,sx,sy;
         srand(12);
         for (i = 0; i < 180; i++){
-            d = i % 2 ? -1 : 1; // strana na kojoj je drvo;
+            d = i % 2 ? -1 : 1; // Strana na kojoj je objekat;
             tr = (180-i)+20;
             rt = rand()%50+20;
             sx = rand()%texture_param;
@@ -266,7 +279,7 @@ static void on_display(void)
             glPushMatrix();
                 glRotatef(60*rt/tr, 0,d,0);
                 glTranslatef(0,0,tr);
-                    //Tekstura trave
+                    // Tekstura trave
                 glEnable(GL_BLEND);
                 glEnable(GL_TEXTURE_2D);
                 glBindTexture(GL_TEXTURE_2D, names[1]);
@@ -286,6 +299,53 @@ static void on_display(void)
         float h = 1;
         draw_tarrget(h, rand_rot, rand_trn);
     glPopMatrix();
+	// Pocetak igre
+    if(on_going <= 0 && on_going == 0) {
+	glColor3f(0,0,0);
+	write_text("Welcome To Shoot Training", width/2-100, height*0.95);
+	write_text("Click 'F' for forest mode or 'C' for city mode", width/2-160, height*0.90);
+	write_text("Start Game on 'S' Button", width/2-80, height*0.85);
+    }
+	// Produzenje igre
+    if(targets_counter >= target_limit) {
+	target_limit += 5;	
+	time_limit += 5;
+    }
+	// Kraj igre
+    if(current_time > time_limit && targets_counter != 0){
+	on_going = -1;
+	glColor3f(0.1,0.1,0.1);
+	write_text("GAME OVER", width/2-40, height*0.75);
+	write_text("Cilck 'S' for New Game", width/2-100, height*0.70);
+	    // Racunanje najboljeg dosadasnjeg uspeha
+    	best_score = targets_counter > best_score ? targets_counter : best_score;
+	sprintf(str, "Best score: %d", best_score);
+	write_text(str, width/2-40, height*0.65);
+	glColor3f(0,0.2,1);
+	sprintf(str, "Your score: %d", targets_counter);
+	write_text(str, width/2-40, height*0.60);
+    }
+	// Ispisuje broj pogodjenih meta
+    glColor3f(0.9, 0.5, 0); 
+    sprintf(str, "Targets: %d / %d", targets_counter, target_limit);
+    write_text(str, 40, height-40);
+	// Ispisuje broj preostalih metkova
+    sprintf(str, "Bullets: %d", bullet_counter);
+    write_text(str, width-140, height-40);
+	// Ispisujemo upozorenje za nedostatak municije
+    if(bullet_counter <= 2 && on_going > 0) {
+	glColor3f(1,0,0);
+	write_text(" Low Ammuniton", width/2-40, height*0.75);
+	write_text("Recharge on 'R' ", width/2-40, height*0.70);
+    }
+	// Ispisujemo vreme preostalo vreme
+    if(on_going > 0){
+	    glColor3f(0,0,1);
+	    sprintf(str, "Time: %ld", time_limit - current_time);
+	    write_text(str, width/2, height-40);
+    }
+
+    glutPostRedisplay();
     glutSwapBuffers();
 }
 
@@ -293,15 +353,15 @@ void initLightAndMaterial(void)
 {
     GLfloat light_position[] = {-100, 100, 100, 0 };
     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-        //Parametri svetlosti
+        // Parametri svetlosti
     GLfloat light_ambient[] = { 0.1, 0.1, 0.1, 1 };
-    GLfloat light_diffuse[] = { 0.6, 0.7, 0.7, 1 };
+    GLfloat light_diffuse[] = { 0.8, 0.7, 0.7, 1 };
     GLfloat light_specular[] = { 0.9, 0.9, 0.9, 1 };
-    GLfloat ambient_coeffs[] = { 0.3, 0.5, 0.3, 1 };
+    GLfloat ambient_coeffs[] = { 0.5, 0.5, 0.3, 1 };
     GLfloat diffuse_coeffs[] = { 1, 1, 1, 1 };
     GLfloat specular_coeffs[] = { 0.1, 0.1, 0.1, 1 };
     GLfloat shininess = 30;
-        //Ukljucivanje svetlosti
+        // Ukljucivanje svetlosti
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
@@ -325,7 +385,7 @@ void write_text(const char* text, int x, int y)
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         glRasterPos2f(x,y); 
-            //ispisivanje karakera
+            // Ispisivanje karakera
         for(int i = 0; text[i]; i++){
             glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, (int) text[i]); 
         }
@@ -344,19 +404,18 @@ void init_texture(){
     image = image_init(0, 0);
 
     glGenTextures(3,names);
+	// Inicijalizacija teksture objekata
     image_read(image, FILENAME1);
     glBindTexture(GL_TEXTURE_2D, names[1]);
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->width, image->height, 0, 
                  GL_RGBA, GL_UNSIGNED_BYTE, image->pixels);
-
+	// Inicijalizacija teksture podloge
     image_read(image, FILENAME2);
     glBindTexture(GL_TEXTURE_2D, names[0]);
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
