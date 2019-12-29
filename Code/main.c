@@ -9,14 +9,14 @@
 #include "func.h"
 #include "image.h"
 
-#define FILENAME1 "tree.bmp"
-#define FILENAME2 "garss.bmp"
-static float matrix[16];
-static GLuint names[3];
-
 #define TIMER_INTERVAL 10
 #define TIMER_ID 0
 #define INF 2000000
+
+static char* FILENAME1 = "tree.bmp";
+static char* FILENAME2 = "grass.bmp";
+static float matrix[16];
+static GLuint names[3];
 
 static int mouse_y, mouse_x;
 static float rand_rot, rand_trn;
@@ -25,6 +25,7 @@ static float rot_rl, rot_ud;
 static int width, height;
 static int targets_counter, bullet_counter;
 static int on_going;
+static int texture_param;
 
 static void on_keyboard(unsigned char key, int x, int y);
 static void on_display(void);
@@ -35,6 +36,7 @@ static void on_mouse(int button, int state, int x, int y);
 static void on_passive_motion(int x, int y);
 static void on_timer(int);
 void write_text(const char* text, int x, int y);
+void init_texture();
 
 int main(int argc, char **argv)
 {
@@ -79,40 +81,14 @@ static void init(void)
         //Brojace pogodjenig meta
     targets_counter = 0;
     bullet_counter = 10;
-
+	//Inicijalizcija primitiva
     glPointSize(5);
     glLineWidth(4);
+	//Inicijalizacija promenljive za scaliranje texture
+    texture_param = 10;
 
         //Inicijalizacij teksture
-    Image * image;
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    image = image_init(0, 0);
-
-    glGenTextures(3,names);
-    image_read(image, FILENAME1);
-    glBindTexture(GL_TEXTURE_2D, names[1]);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->width, image->height, 0, 
-                 GL_RGBA, GL_UNSIGNED_BYTE, image->pixels);
-
-    image_read(image, FILENAME2);
-    glBindTexture(GL_TEXTURE_2D, names[0]);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height, 
-                    0, GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-    image_done(image);
+    init_texture();
 }
 
 static void on_keyboard(unsigned char key, int x, int y)
@@ -121,10 +97,19 @@ static void on_keyboard(unsigned char key, int x, int y)
     case 27:    // Izlazak iz programa
         exit(0);
         break;
-    case 'm':   //Random geerisanje mete
-        rand_rot = (rand() % 60) - 30;
-        rand_trn = (rand() % 20) + 10;
-        glutPostRedisplay();
+    case 'c':
+    case 'C':   //Ukljucujemo city mode
+	texture_param = 30;
+	FILENAME1 = "build.bmp";
+        FILENAME2 = "asph.bmp";
+	init_texture();
+        break;
+    case 'f':
+    case 'F':   //Ukljucujemo forest mode
+	texture_param = 10;
+	FILENAME1 = "tree.bmp";
+        FILENAME2 = "grass.bmp";
+	init_texture();
         break;
     case 'r':
     case 'R':
@@ -151,7 +136,7 @@ static void on_timer(int v)
     glutPostRedisplay();
         // TO DO postavi bolji pogodak
         //proverava da li je meta pogodjone i ako jeste zadaje se nova
-    if(anim_param > rand_trn && (-rot_rl < rand_rot+25/15.0 && -rot_rl > rand_rot-25/15.0 ) && rot_ud > 0.5 && rot_ud < 3*25/(float)rand_trn){
+    if(anim_param > rand_trn && (-rot_rl < rand_rot+25/(float)rand_trn && -rot_rl > rand_rot-25/(float)rand_trn ) && rot_ud > 0.5/(float)rand_trn && rot_ud < 3*25/(float)rand_trn){
         srand(time(NULL));
         rand_rot = (rand() % 45) - 15;
         rand_trn = (rand() % 10) + 15;
@@ -187,15 +172,16 @@ static void on_passive_motion(int x, int y)
     delta_y = y - mouse_y;
     mouse_x = x;
     mouse_y = y;
-    float mov = 1;
+    float mov = 0.5;
+    float eps = 0.01;
         //Kretanje kamere
-    if(delta_x > mov && rot_rl < 40)
+    if(delta_x > eps && rot_rl < 40)
         rot_rl += mov;
-    else if(delta_x < -mov && rot_rl > -40)
+    else if(delta_x < -eps && rot_rl > -40)
         rot_rl -= mov;
-    if(delta_y > mov && rot_ud < 30)
+    if(delta_y > eps && rot_ud < 30)
         rot_ud += mov;
-    else if(delta_y < -mov && rot_ud > -20)
+    else if(delta_y < -eps && rot_ud > -20)
         rot_ud -= mov;
     glutPostRedisplay();
 }
@@ -263,9 +249,9 @@ static void on_display(void)
         glBegin(GL_QUADS);
             glNormal3f(0,1,0);
             glTexCoord2f(0,0); glVertex3f(100,0,-10);
-            glTexCoord2f(50,0); glVertex3f(-100,0,-10);
-            glTexCoord2f(50,50);  glVertex3f(-100,0,300);
-            glTexCoord2f(0,50); glVertex3f(100,0,300);
+            glTexCoord2f(5*texture_param,0); glVertex3f(-100,0,-10);
+            glTexCoord2f(5*texture_param,5*texture_param); glVertex3f(-100,0,300);
+            glTexCoord2f(0,5*texture_param); glVertex3f(100,0,300);
         glEnd();
         glBindTexture(GL_TEXTURE_2D, 0);
         int i = 0;
@@ -275,7 +261,7 @@ static void on_display(void)
             d = i % 2 ? -1 : 1; // strana na kojoj je drvo;
             tr = (180-i)+20;
             rt = rand()%50+20;
-            sx = rand()%10;
+            sx = rand()%texture_param;
             sy = rand()%10;
             glPushMatrix();
                 glRotatef(60*rt/tr, 0,d,0);
@@ -348,4 +334,36 @@ void write_text(const char* text, int x, int y)
         glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
     glEnable(GL_LIGHTING);
+}
+
+void init_texture(){
+	Image * image;
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    image = image_init(0, 0);
+
+    glGenTextures(3,names);
+    image_read(image, FILENAME1);
+    glBindTexture(GL_TEXTURE_2D, names[1]);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->width, image->height, 0, 
+                 GL_RGBA, GL_UNSIGNED_BYTE, image->pixels);
+
+    image_read(image, FILENAME2);
+    glBindTexture(GL_TEXTURE_2D, names[0]);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height, 
+                    0, GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    image_done(image);
 }
