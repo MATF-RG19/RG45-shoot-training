@@ -387,13 +387,7 @@ void draw_sight(float l)
     glRotatef(-90, 1, 0, 0);    
         draw_cilindar(4,2.2);
     glTranslatef(0, 0, -3);
-
-    glTranslatef(0, -16, 3);      
-    glRotatef(-90, 1, 0, 0);
-        //glutSolidCone(1.61, 6, 20, 1);
-    glRotatef(90, 1, 0, 0);    
-    glTranslatef(0, 16, -3);
-
+    
     glTranslatef(0,-14,3);
         glColor3f(.5, 0.6, 0.9);
         glutSolidSphere(1.5,20,20);
@@ -402,7 +396,7 @@ void draw_sight(float l)
         draw_cone(2.4,1.6);
     glTranslatef(0,16,-3);
 
-    //Prednji nisan
+    //Prednji nisan puske
     glTranslatef(0,37,-3);
     glColor3f(0.2,0.2,0.2);
     glBegin(GL_POLYGON);
@@ -464,7 +458,7 @@ void draw_sight(float l)
     glTranslatef(0,-37,3);
     
 }
-    //Okidac i delovi oko njega
+    // Okidac i delovi oko njega
 void draw_trriger() 
 {
     float w = 0.4;
@@ -473,7 +467,7 @@ void draw_trriger()
 
     glTranslatef(0,-14,-6.3);
 
-    //okidac
+    // Okidac
     glBegin(GL_POLYGON);
         glNormal3f(-1,0,0);
         glVertex3f(0,0,3);
@@ -496,7 +490,7 @@ void draw_trriger()
         glVertex3f(0,0,3);
     glEnd();
 
-        //zastitnik okidaca
+        // Zastitnik okidaca
     glBegin(GL_POLYGON);
         glVertex3f(-w,0,0);
         glVertex3f(-w,0,-h);
@@ -542,7 +536,7 @@ void draw_trriger()
     glTranslatef(0,14,6.3);
 
 }
-    //Ovde sastavljamo sve delove puske u jednu celinu
+    // Ovde sastavljamo sve delove puske u jednu celinu
 void make_rifle() 
 {
     glColor3f(0.8,0.8,0.4);
