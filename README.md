@@ -2,8 +2,8 @@
 ___
 
 ### :memo: Opis igrice:
-Igrica 'Shoot-Training' je simulicija streljane na otvorenom gde igrac ima za cilj da sto vise meta pogodi u odredjenom vremenskom periodu. Mete mogus su iskacuce, a sustina je pogodite sto vise meta. Igrac u rukama ima pusku
-kojom moze da gadja u metu. Nove mete se dobijaju na svkaih pet pogodaka ako vreme nije isteklo, i naravno dobija se dodatno vreme za nove mete. Kad vreme istekne dobijate postignuti rezultat, kao i najbolji postignuti rezultat za vreme igranja. Igricu ne morate pokretati uvek iznova, dovoljno je jednom pokrenuti i klikom na odredjeno dugme igrati iznova i iznova.
+Igrica 'Shoot-Training' je simulicija streljane na otvorenom gde igrac ima za cilj da sto vise meta pogodi u odredjenom vremenskom periodu. Mete su iskacuce, a sustina je pogodite sto vise meta. Igrac u rukama ima pusku
+kojom moze da gadja u metu. Nove mete se dobijaju na svkaih pet pogodaka ako vreme nije isteklo, i naravno dobija se dodatno vreme za nove mete. Kad vreme istekne dobijate postignuti rezultat, kao i najbolji postignuti rezultat za vreme igranja. Igricu ne morate pokretati uvek iznova, dovoljno je jednom pokrenuti i klikom na odredjeno dugme igrati iznova i iznova. Pratite Uputstva i uzivajte u igri!
 ___
 
 ### :video_game: Komande igrice:
