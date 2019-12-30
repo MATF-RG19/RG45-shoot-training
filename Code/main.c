@@ -13,24 +13,23 @@
 #define TIMER_ID 0
 #define INF 2000000
 
-static char* FILENAME1 = "tree.bmp";
-static char* FILENAME2 = "grass.bmp";
-static float matrix[16];
+static char* FILENAME1 = "tree.bmp"; // Slika teksture objekta
+static char* FILENAME2 = "grass.bmp"; // Slika teksture podloge
+static float matrix[16]; 
 static GLuint names[3];
 
-static long t;
+static long t; // Vreme pocetka partije
 static int mouse_y, mouse_x;
-static float rand_rot, rand_trn;
+static float rand_rot, rand_trn; // Promenljive postavvljanja mete
 static float anim_param;
-static float rot_rl, rot_ud;
-static int width, height;
-static int targets_counter, bullet_counter;
-static int best_score = -1;
-static int on_going;
-static int texture_param;
-static int start = 0;
-int target_limit = 0;	
-int time_limit = 0;
+static float rot_rl, rot_ud; // Kretanje kamere u odnosu na svet (right-left  up-down)
+static int width, height; // Dimezije ekrana
+static int targets_counter, bullet_counter; // Brojaci pogodaka i metkova
+static int best_score = -1; // Najbolji uspeh tokom igre
+static int on_going; // Oznacavanje toka igre
+static int texture_param; // Parametar koji regulise sirinu slike texture drvo-zgrada
+int target_limit = 0; // Broj meta potrebnih za produzetak igre
+int time_limit = 0; // Preostalo vreme za igranje
 
 static void on_keyboard(unsigned char key, int x, int y);
 static void on_display(void);
@@ -93,7 +92,6 @@ static void init(void)
     glLineWidth(4);
 	// Inicijalizacija promenljive za scaliranje texture
     texture_param = 10;
-
         // Inicijalizacij teksture
     init_texture();
 }
@@ -105,13 +103,15 @@ static void on_keyboard(unsigned char key, int x, int y)
         exit(0);
         break;
     case 's':
-    case 'S':   // Pokrecemo igru
-	on_going = 1;
-	t = time(NULL);
-	target_limit = 5;	
-	time_limit = 10;
-	targets_counter = 0;
-	bullet_counter = 10;
+    case 'S':   // Pokrecemo igru ako nije pokrenuta
+	if (on_going < 1){
+		on_going = 1;
+		t = time(NULL);
+		target_limit = 5;	
+		time_limit = 10;
+		targets_counter = 0;
+		bullet_counter = 10;
+	}
         break;
     case 'e':
     case 'E':   // Zavrsavamo partiju
@@ -147,7 +147,7 @@ static void on_timer(int v)
     glutPostRedisplay();
         // Proverava da li je meta pogodjone i ako jeste zadaje se nova
     if(anim_param > rand_trn && (-rot_rl < rand_rot+25/(float)rand_trn && -rot_rl > rand_rot-25/(float)rand_trn ) && rot_ud > 0.5/(float)rand_trn && rot_ud < 3*25/(float)rand_trn){
-        srand(time(NULL));
+        srand(time(NULL)); // Meta dobije novu slucajnu poziciju
         rand_rot = (rand() % 45) - 15;
         rand_trn = (rand() % 10) + 15;
         targets_counter ++;
@@ -166,9 +166,9 @@ static void on_mouse(int button, int state, int x, int y)
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) { 
         if (bullet_counter == 0 || on_going <= 0) 
             return;
-            // Ispaljivanje metka
+            // Ispaljivanje metka klikom misa
         bullet_counter--;
-        anim_param = 1;
+        anim_param = 1; // Pokrece se animacija metka
         glutTimerFunc(TIMER_INTERVAL, on_timer, TIMER_ID);
         anim_param = 0;
         glutPostRedisplay();
@@ -178,13 +178,13 @@ static void on_mouse(int button, int state, int x, int y)
 static void on_passive_motion(int x, int y)
 {
     int delta_x, delta_y;
-    delta_x = x - mouse_x;
-    delta_y = y - mouse_y;
+    delta_x = x - mouse_x; // Pomeraj x
+    delta_y = y - mouse_y; // Pomeraj y
     mouse_x = x;
     mouse_y = y;
-    float mov = 0.5;
-    float eps = 0.01;
-        // Kretanje kamere
+    float mov = 0.5; // Pomeranje kamere
+    float eps = 0.01; // Detekcija pomeraja
+        // Kretanje kamere u granicama terena (l:-40, r:40, u:30, d:-20)
     if(delta_x > eps && rot_rl < 40)
         rot_rl += mov;
     else if(delta_x < -eps && rot_rl > -40)
@@ -208,8 +208,8 @@ static void on_reshape(int w, int h)
 
 static void on_display(void)
 {
-    long current_time = time(NULL) - t;
-    char str[32];
+    long current_time = time(NULL) - t; // Vreme za igru
+    char str[32]; // Bafer teksta 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -217,7 +217,7 @@ static void on_display(void)
         // Nisan
     glColor3f(1, 0.4, 0.1); 
     write_text("-+-", width/2-10, height/2+10);
-        // Isacrtavanje puske
+        // Isacrtavanje puske i ruku
     float f_react = anim_param < 10 ? anim_param : 0;
     glRotatef(180,0,1,0);
     glRotatef(-90+f_react,1,0,0);
@@ -249,7 +249,7 @@ static void on_display(void)
     glPopMatrix();
     glRotatef(-rot_ud,1,0,0);
     glRotatef(rot_rl, 0,90,0);
-        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_TEXTURE_2D); // Ukljucivanje tekstura
         glBindTexture(GL_TEXTURE_2D, names[0]);
         glBegin(GL_QUADS);
             glNormal3f(0,1,0);
@@ -260,14 +260,14 @@ static void on_display(void)
         glEnd();
         glBindTexture(GL_TEXTURE_2D, 0);
         int i = 0;
-        int tr,rt,d,sx,sy;
+        int tr,rt,d,sx,sy; // Parametrii za definisanje objeata(drvo) na slici 
         srand(12);
         for (i = 0; i < 180; i++){
             d = i % 2 ? -1 : 1; // Strana na kojoj je objekat;
-            tr = (180-i)+20;
-            rt = rand()%50+20;
-            sx = rand()%texture_param;
-            sy = rand()%10;
+            tr = (180-i)+20; // Translacija od koo pocetka
+            rt = rand()%50+20; // Rotacija
+            sx = rand()%texture_param; // Sirina slike (objekta)
+            sy = rand()%10; // Visina slike (objekta)
             glPushMatrix();
                 glRotatef(60*rt/tr, 0,d,0);
                 glTranslatef(0,0,tr);
@@ -287,7 +287,7 @@ static void on_display(void)
                 glDisable(GL_BLEND);
             glPopMatrix();
         }
-            // Meta
+            // Meta sa parametrima u odnosu na koo pocetak
         float h = 1;
         draw_tarrget(h, rand_rot, rand_trn);
     glPopMatrix();
@@ -330,7 +330,7 @@ static void on_display(void)
 	write_text(" Low Ammuniton", width/2-40, height*0.75);
 	write_text("Reload on 'R' ", width/2-40, height*0.70);
     }
-	// Ispisujemo vreme preostalo vreme
+	// Ispisujemo preostalo vreme
     if(on_going > 0){
 	    glColor3f(0,0,1);
 	    sprintf(str, "Time: %ld", time_limit - current_time);
@@ -359,6 +359,7 @@ void initLightAndMaterial(void)
     glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
     glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+	// Osobine Materijala
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient_coeffs);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse_coeffs);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular_coeffs);
