@@ -1,5 +1,5 @@
 /////////////////////////////////////////////
-/// Preuzeto sa 7.casa vezbi 
+/// Preuzeto sa 7.casa vezbi
 ////////////////////////////////////////////
 /*
  * Dve strukture koje opisuju strukturu dva zaglavlja
@@ -30,7 +30,8 @@ typedef struct {
 /* Struktura za smestanje podataka o slici. */
 typedef struct Image {
   int width, height; /* Dimenzije slike. */
-  char *pixels; /* Niz u kojem se cuvaju podaci za sve piksele u obliku (R, G, B). */
+  char *pixels; /* Niz u kojem se cuvaju podaci za sve piksele u obliku (R, G,
+                   B). */
 } Image;
 
 /* Funkcija koja inicijalizuje strukturu i vraca pokazivac na nju. */
@@ -48,4 +49,3 @@ void image_done(Image *image);
  * image.
  */
 void image_read(Image *image, char *filename);
-

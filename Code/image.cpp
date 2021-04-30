@@ -1,10 +1,10 @@
 /////////////////////////////////////////////
-/// Preuzeto sa 7.casa vezbi 
+/// Preuzeto sa 7.casa vezbi
 ////////////////////////////////////////////
-#include <assert.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include "image.hpp"
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 Image *image_init(int width, int height) {
 
@@ -14,7 +14,7 @@ Image *image_init(int width, int height) {
   assert(width >= 0 && height >= 0);
 
   /* Alocira se prostor za smestanje clanova strukture. */
-  image = (Image *) malloc(sizeof(Image));
+  image = (Image *)malloc(sizeof(Image));
   assert(image != NULL);
 
   /* Inicijlizuju se clanovi strukture. */
@@ -85,8 +85,8 @@ void image_read(Image *image, char *filename) {
   image->height = bih.height;
 
   /*
-   * U zavisnosti od toga koliko bitova informacija se cita po pikselu 
-   * (da li samo R, G i B komponenta ili R, G, B i A), alociramo niz 
+   * U zavisnosti od toga koliko bitova informacija se cita po pikselu
+   * (da li samo R, G i B komponenta ili R, G, B i A), alociramo niz
    * odgovarajuce duzine.
    */
   if (bih.bitcount == 24)
@@ -94,7 +94,8 @@ void image_read(Image *image, char *filename) {
   else if (bih.bitcount == 32)
     image->pixels = (char *)malloc(4 * bih.width * bih.height * sizeof(char));
   else {
-    fprintf(stderr, "image_read(): Podrzane su samo slike koje po pikselu cuvaju 24 ili 32 bita podataka.\n");
+    fprintf(stderr, "image_read(): Podrzane su samo slike koje po pikselu "
+                    "cuvaju 24 ili 32 bita podataka.\n");
     exit(1);
   }
   assert(image->pixels != NULL);
@@ -102,14 +103,15 @@ void image_read(Image *image, char *filename) {
   /* Ucitavaju se podaci o pikselima i smestaju u alocirani niz. */
   if (bih.bitcount == 24)
     /*
-     * Ako se po pikselu cita 24 bita = 3 bajta informacija, pretpostavljamo 
-     * da oni (ta 3 bajta) predstavljaju R, G i B komponentu boje (1 bajt po 
+     * Ako se po pikselu cita 24 bita = 3 bajta informacija, pretpostavljamo
+     * da oni (ta 3 bajta) predstavljaju R, G i B komponentu boje (1 bajt po
      * komponenti).
      */
     for (i = 0; i < bih.width * bih.height; i++) {
       /*
-       * Ovo mozda izgleda cudno, to sto se komponente boje citaju u suprotnom redosledu, 
-       * tj. prvo plava, pa zelena, pa crvena, ali tako pise u specifikaciji bmp formata.
+       * Ovo mozda izgleda cudno, to sto se komponente boje citaju u suprotnom
+       * redosledu, tj. prvo plava, pa zelena, pa crvena, ali tako pise u
+       * specifikaciji bmp formata.
        */
       fread(&b, sizeof(char), 1, file);
       fread(&g, sizeof(char), 1, file);
@@ -121,8 +123,8 @@ void image_read(Image *image, char *filename) {
     }
   else if (bih.bitcount == 32)
     /*
-     * Ako se po pikselu cita 32 bita = 4 bajta informacija, pretpostavljamo 
-     * da oni (ta 4 bajta) predstavljaju R, G, B i A komponentu boje (1 bajt po 
+     * Ako se po pikselu cita 32 bita = 4 bajta informacija, pretpostavljamo
+     * da oni (ta 4 bajta) predstavljaju R, G, B i A komponentu boje (1 bajt po
      * komponenti).
      */
     for (i = 0; i < bih.width * bih.height; i++) {
