@@ -1,5 +1,5 @@
-#ifndef _func_H_
-#define _func_H_
+#ifndef FUNC_HPP
+#define FUNC_HPP
 
 void fire(float bullet_trn);
 void draw_tarrget(int h, int rot, int trn);

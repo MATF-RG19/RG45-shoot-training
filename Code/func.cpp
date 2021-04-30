@@ -1,4 +1,4 @@
-#include "func.h"
+#include "func.hpp"
 #include <stdlib.h>
 #include <GL/glut.h>
 

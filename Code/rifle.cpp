@@ -1,4 +1,4 @@
-#include "rifle.h"
+#include "rifle.hpp"
 
 #include <stdlib.h>
 #include <GL/glut.h>

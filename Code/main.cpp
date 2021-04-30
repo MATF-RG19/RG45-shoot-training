@@ -4,10 +4,10 @@
 #include <math.h>
 #include <GL/glut.h>
 
-#include "hands.h"
-#include "rifle.h"
-#include "func.h"
-#include "image.h"
+#include "hands.hpp"
+#include "rifle.hpp"
+#include "func.hpp"
+#include "image.hpp"
 
 #define TIMER_INTERVAL 10
 #define TIMER_ID 0

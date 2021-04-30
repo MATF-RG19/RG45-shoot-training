@@ -1,5 +1,5 @@
-#ifndef _RIFLE_H_
-#define _RIFLE_H_
+#ifndef RIFLE_HPP
+#define RIFLE_HPP
 
 void    draw_body();
 void    draw_cilindar(float, float);

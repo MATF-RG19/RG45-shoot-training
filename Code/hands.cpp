@@ -1,5 +1,5 @@
-#include "hands.h"
-#include "rifle.h"
+#include "hands.hpp"
+#include "rifle.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>

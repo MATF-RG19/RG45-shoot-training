@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "image.h"
+#include "image.hpp"
 
 Image *image_init(int width, int height) {
 
