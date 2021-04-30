@@ -13,8 +13,8 @@
 #define TIMER_ID 0
 #define INF 2000000
 
-static char* FILENAME1 = "tree.bmp"; // Slika teksture objekta
-static char* FILENAME2 = "grass.bmp"; // Slika teksture podloge
+static char* FILENAME1 = "../tree.bmp"; // Slika teksture objekta
+static char* FILENAME2 = "../grass.bmp"; // Slika teksture podloge
 static float matrix[16]; 
 static GLuint names[3];
 
